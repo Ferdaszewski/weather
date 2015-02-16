@@ -41,5 +41,5 @@ if __name__ == '__main__':
     # Test, save JSON to local file and print HTTP response
     test_forecast = Forecast(lat, lng)
     print test_forecast.headers
-    with open('JSON-test-data-dump.json', 'w') as f:
+    with open('data-dump.json', 'w') as f:
         json.dump(test_forecast.data, f, indent=2)

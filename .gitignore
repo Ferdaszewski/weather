@@ -1,3 +1,5 @@
 # Files to ignore
 *.svg
 *.json
+*.db
+*.pyc
