@@ -1,4 +1,6 @@
-"""Module to manage a local SQLite database of city geo info."""
+"""Module to manage a local SQLite database of latitude and longitude
+of international cities and US postal codes.
+"""
 import codecs
 import csv
 import datetime
@@ -7,6 +9,20 @@ import sys
 
 # Constants
 DATE_FORMAT = '%Y-%m-%d'
+USZIP_KEYS = (
+    'country_code',
+    'postal_code',
+    'place_name',
+    'admin1_name',
+    'admin1_code',
+    'admin2_name',
+    'admin2_code',
+    'admin3_name',
+    'admin3_code',
+    'latitude',
+    'longitude',
+    'accuracy'
+    )
 GEONAME_KEYS = (
     'geonameid',
     'name',
@@ -33,9 +49,30 @@ GEONAME_KEYS = (
 db = SqliteDatabase('cities.db')
 
 
+class UsZip(Model):
+    """Database model to hold us zipcode information."""
+    country_code = CharField(max_length=2)
+
+    # While US codes are integers, other country postal codes are not.
+    # Note: US postal codes are not guaranteed to be unique.
+    postal_code = CharField(max_length=20, index=True)
+    place_name = CharField(max_length=180)
+    admin1_name = CharField(max_length=100, null=True)
+    admin1_code = CharField(max_length=20, null=True)
+    admin2_name = CharField(max_length=100, null=True)
+    admin2_code = CharField(max_length=20, null=True)
+    admin3_name = CharField(max_length=100, null=True)
+    admin3_code = CharField(max_length=20, null=True)
+    latitude = FloatField()
+    longitude = FloatField()
+    accuracy = CharField(null=True)
+
+    class Meta:
+        database = db
+
 class City(Model):
     """Database model to hold city geo information."""
-    geonameid = IntegerField(primary_key=True)
+    geonameid = IntegerField(primary_key=True, unique=True)
     name = CharField(max_length=200)
     asciiname = CharField(max_length=200, null=True)
     alternatenames = TextField(null=True)
@@ -77,52 +114,66 @@ def utf_8_encoder(unicode_csv_data):
         yield line.encode('utf-8')
 
 
-def load_file(geoname_file):
-    """Load 'geoname' cities tab-delimited text file into a list of.
-    cities (dict).
-    """
-    # Avoid field limit (131072) csv error by expanding size limit
+def load_file(file_name, data_keys):
+    """Load tab-delimited text file into a list of dicts."""
+
+    # Avoid field limit (131072) _csv error by expanding size limit
     csv.field_size_limit(sys.maxsize)
 
-    with codecs.open(geoname_file, 'r', 'utf_8') as geo_file:
-        reader = unicode_csv_reader(geo_file, delimiter='\t')
+    with codecs.open(file_name, 'r', 'utf_8') as data_file:
+        reader = unicode_csv_reader(data_file, delimiter='\t')
         cities = []
         num_cities = 0
-        for count, city in enumerate(reader):
+        for row in reader:
 
             # Fixes PeeWee error with '' for ints.
-            city = [i if i != '' else None for i in city]
-            city[-1] = datetime.datetime.strptime(city[-1], DATE_FORMAT).date()
+            row = [i if i != '' else None for i in row]
 
-            # Dict for each city, list
-            cities.append(dict(zip(GEONAME_KEYS, city)))
+            # Dict for each row, list
+            cities.append(dict(zip(data_keys, row)))
             num_cities += 1
-    print "%d cities loaded from %s." % (num_cities, geoname_file)
+    print "%d rows loaded from %s" % (num_cities, file_name)
     return cities
 
 
-def load_db(data):
-    """Delete any existing data, then load the database. data is list of
-    cities (dict). Each city is a new row in the db.
+def load_db(data, table):
+    """Load data into the database table. data is list of rows (dict).
+    Each dict is a new row in the db.
     """
     # Insert rows 500 at a time
     # 1000 per time suggestion from peewee documentation fails:
     # "too many terms in compound SELECT"
     with db.transaction():
         for idx in range(0, len(data), 500):
-            City.insert_many(data[idx:idx+500]).execute()
-    print "%d cities loaded into database." % City.select().count()
+            table.insert_many(data[idx:idx+500]).execute()
+    print "%d cities loaded into database." % table.select().count()
 
 
 def create_tables():
-    """Small helper function to create the tables in the database."""
+    """Small helper function to delete existing tables and create new
+    tables in the database.
+    """
     db.connect()
-    db.create_tables([City])
+    City.drop_table(fail_silently=True)
+    UsZip.drop_table(fail_silently=True)
+    db.create_tables([City, UsZip], safe=True)
     db.close()
 
 
 if __name__ == '__main__':
     db.connect()
-    City.delete().execute()
-    load_db(load_file('geonames/cities5000.txt'))
+    create_tables()
+
+    # Load city geo info
+    city_list = load_file('sources/geonames/cities5000.txt', GEONAME_KEYS)
+
+    # Convert "modification_date" to datetime.date
+    for city in city_list:
+        city['modification_date'] = datetime.datetime.strptime(
+            city['modification_date'], DATE_FORMAT).date()
+    load_db(city_list, City)
+
+    # Load postal code info
+    load_db(load_file('sources/uszip/US.txt', USZIP_KEYS), UsZip)
+
     db.close()
