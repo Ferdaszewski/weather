@@ -3,10 +3,10 @@ import codecs
 import csv
 import datetime
 from peewee import *
-import sqlite3
 import sys
 
 # Constants
+DATE_FORMAT = '%Y-%m-%d'
 GEONAME_KEYS = (
     'geonameid',
     'name',
@@ -59,9 +59,10 @@ class City(Model):
         database = db
 
 
-# Unicode methods from Python docs
 def unicode_csv_reader(unicode_csv_data, **kwargs):
-    # csv.py doesn't do Unicode; encode temporarily as UTF-8:
+    """csv.py doesn't do Unicode; encode temporarily as UTF-8.
+    Source: Python documentation.
+    """
     csv_reader = csv.reader(utf_8_encoder(unicode_csv_data), **kwargs)
     for row in csv_reader:
         # decode UTF-8 back to Unicode, cell by cell:
@@ -69,44 +70,59 @@ def unicode_csv_reader(unicode_csv_data, **kwargs):
 
 
 def utf_8_encoder(unicode_csv_data):
+    """Decode UTF-8 back to Unicode.
+    Source: Python documentation.
+    """
     for line in unicode_csv_data:
         yield line.encode('utf-8')
 
 
 def load_file(geoname_file):
-    """Load 'geoname' cities tab-delimited text file into list of dicts."""
+    """Load 'geoname' cities tab-delimited text file into a list of.
+    cities (dict).
+    """
     # Avoid field limit (131072) csv error by expanding size limit
     csv.field_size_limit(sys.maxsize)
 
-    with codecs.open(geoname_file, 'r', 'utf_8') as f:
-        reader = unicode_csv_reader(f, delimiter='\t')
+    with codecs.open(geoname_file, 'r', 'utf_8') as geo_file:
+        reader = unicode_csv_reader(geo_file, delimiter='\t')
         cities = []
-        for city in reader:
+        num_cities = 0
+        for count, city in enumerate(reader):
 
-            # PeeWee error with u'' for ints, change all '' to None
+            # Fixes PeeWee error with '' for ints.
             city = [i if i != '' else None for i in city]
+            city[-1] = datetime.datetime.strptime(city[-1], DATE_FORMAT).date()
 
+            # Dict for each city, list
             cities.append(dict(zip(GEONAME_KEYS, city)))
-
+            num_cities += 1
+    print "%d cities loaded from %s." % (num_cities, geoname_file)
     return cities
 
 
 def load_db(data):
-    """Load the database with the data passed in (list of dicts). Each
-    dict is a new row in the db.
+    """Delete any existing data, then load the database. data is list of
+    cities (dict). Each city is a new row in the db.
     """
-    # Insert rows 500 at a time 1000 suggestion from peewee
-    # documentation fails: too many terms in compound SELECT
+    # Insert rows 500 at a time
+    # 1000 per time suggestion from peewee documentation fails:
+    # "too many terms in compound SELECT"
     with db.transaction():
         for idx in range(0, len(data), 500):
             City.insert_many(data[idx:idx+500]).execute()
+    print "%d cities loaded into database." % City.select().count()
 
 
 def create_tables():
     """Small helper function to create the tables in the database."""
     db.connect()
     db.create_tables([City])
+    db.close()
 
 
 if __name__ == '__main__':
-    load_db(load_file('cities5000.txt'))
+    db.connect()
+    City.delete().execute()
+    load_db(load_file('geonames/cities5000.txt'))
+    db.close()
