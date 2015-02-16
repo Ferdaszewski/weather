@@ -3,3 +3,6 @@
 *.json
 *.db
 *.pyc
+
+# Folders to ignore
+sources*/
