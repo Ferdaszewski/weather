@@ -1,5 +1,5 @@
-"""Module to manage a local SQLite database of latitude and longitude
-of international cities and US postal codes.
+"""Module to manage a local SQLite database with latitude and longitude
+of bot international cities and US postal codes.
 """
 import codecs
 import csv
@@ -46,7 +46,7 @@ GEONAME_KEYS = (
     )
 
 # Use SqliteDatabase
-db = SqliteDatabase('cities.db')
+db = SqliteDatabase('location_data.db')
 
 
 class UsZip(Model):
@@ -55,7 +55,7 @@ class UsZip(Model):
 
     # While US codes are integers, other country postal codes are not.
     # Note: US postal codes are not guaranteed to be unique.
-    postal_code = CharField(max_length=20, index=True)
+    postal_code = CharField(max_length=5, index=True)
     place_name = CharField(max_length=180)
     admin1_name = CharField(max_length=100, null=True)
     admin1_code = CharField(max_length=20, null=True)
