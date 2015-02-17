@@ -9,6 +9,9 @@ import sys
 
 # Constants
 DATE_FORMAT = '%Y-%m-%d'
+CITY_DATA_FILE = 'sources/geonames/cities5000.txt'
+COUNTRY_DATA_FILE = 'sources/geonames/countryInfo.txt'
+ZIP_DATA_FILE = 'sources/uszip/US.txt'
 USZIP_KEYS = (
     'country_code',
     'postal_code',
@@ -81,6 +84,11 @@ class City(Model):
     feature_class = CharField(max_length=1)
     feature_code = CharField(max_length=10)
     country_code = CharField(max_length=2)
+
+    # Not in source data, added from countryInfo.txt
+    country_code3 = CharField(max_length=3, null=True)
+    country_name = CharField(max_length=200, null=True)
+
     cc2 = CharField(max_length=60, null=True)
     admin1 = CharField(max_length=20, null=True)
     admin2 = CharField(max_length=80, null=True)
@@ -160,20 +168,42 @@ def create_tables():
     db.close()
 
 
+def add_city_data(city_list):
+    """Changes modification_date to datetime.date and adds country name
+    and ISO3 country code.
+    """
+    # Change string to datetime.date
+    for city in city_list:
+        city['modification_date'] = datetime.datetime.strptime(
+            city['modification_date'], DATE_FORMAT).date()
+
+    # Load country name info into a dict of dicts
+    co_name_data = {}
+    with codecs.open(COUNTRY_DATA_FILE, 'r', 'utf-8') as data_file:
+        for line in data_file:
+            line_list = line.split('\t')
+            if line_list[0][0] != '#':
+                co_name_data[line_list[0]] = {
+                    "country_code3": line_list[1],
+                    "country_name": line_list[4]
+                }
+
+    # Load country name data into each country/row
+    for city in city_list:
+        city.update(co_name_data[city['country_code']])
+
+    return city_list
+
+
 if __name__ == '__main__':
     db.connect()
     create_tables()
 
     # Load city geo info
-    city_list = load_file('sources/geonames/cities5000.txt', GEONAME_KEYS)
-
-    # Convert "modification_date" to datetime.date
-    for city in city_list:
-        city['modification_date'] = datetime.datetime.strptime(
-            city['modification_date'], DATE_FORMAT).date()
-    load_db(city_list, City)
+    city_list = load_file(CITY_DATA_FILE, GEONAME_KEYS)
+    load_db(add_city_data(city_list), City)
 
     # Load postal code info
-    load_db(load_file('sources/uszip/US.txt', USZIP_KEYS), UsZip)
+    load_db(load_file(ZIP_DATA_FILE, USZIP_KEYS), UsZip)
 
     db.close()

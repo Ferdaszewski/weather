@@ -13,8 +13,7 @@ class dbsearch(object):
 
     def search(self, search_term):
         """Search for the latitude and longitude of the search_term.
-        Returns location (latitude, longitude), otherwise returns a
-        list of possible matches or None.
+        Returns location (latitude, longitude), otherwise None.
         """
 
         # Validate search_term, no empty strings or None
@@ -28,16 +27,17 @@ class dbsearch(object):
             return None
 
         # Only one zip-code-like string (i.e. five digits)
-        if len(self.search_list) == 1 and re.match(r'^\d{5}$', self.search_list[0]):
+        if len(self.search_list) == 1 and re.match(r'^\d{5}$',
+                                                   self.search_list[0]):
             return zip_search(self.search_list[0])
         else:
-            # search city db
-            pass
+            return city_search(self.search_list)
 
 
 def zip_search(term):
-    """Search the UsZip database for the postal code. Returns
-    the latitude and longitude if found, None otherwise."""
+    """Search the UsZip database for the postal code. Return
+    the latitude and longitude if found, None otherwise.
+    """
     with locdb.db.connect():
         try:
             result = locdb.UsZip.get(postal_code=term)
@@ -45,6 +45,13 @@ def zip_search(term):
             print e
             return None
         return result.latitude, result.longitude
+
+
+def city_search(term_list):
+    """Search the City database and return the latitude and longitude
+    if only one city found, otherwise None.
+    """
+    
 
 
 if __name__ == '__main__':
@@ -65,4 +72,3 @@ if __name__ == '__main__':
     ]
     for test in tests:
         print temp.search(test)
-        
