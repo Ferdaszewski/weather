@@ -132,7 +132,7 @@ if __name__ == '__main__':
 
     # Temp test for search to forecast to svg
     tests = [
-    "batman"
+        "batman"
     ]
 
     for test in tests:
