@@ -74,7 +74,7 @@ def create_chart(line_list):
                 min_max_index.append(str(i))
         chart.x_labels = map(str, range(len(line.data)))
 
-    # Only show min and max value dots
+    # Mark min and max value dots
     chart.x_labels_major = min_max_index
 
     return chart

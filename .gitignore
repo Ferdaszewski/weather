@@ -5,4 +5,4 @@
 *.pyc
 
 # Folders to ignore
-sources*/
+data-sources*/
