@@ -130,12 +130,9 @@ if __name__ == '__main__':
     #         print new_location.name
     #     print "=" * 100
 
-    # Temp test for search to forecast
+    # Temp test for search to forecast to svg
     tests = [
-        "岡崎市",
-        "Bad Place Name",
-        "97218",
-        "Springfield"
+    "batman"
     ]
 
     for test in tests:

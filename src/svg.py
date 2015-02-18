@@ -89,7 +89,7 @@ if __name__ == '__main__':
             file_name += metric + '-'
         chart = create_chart(line_list)
         file_name += 'chart.svg'
-        chart.render_to_file(file_name)
+        chart.render_to_file("../web/svg/" + file_name)
 
     # Test case 1 - % based metrics
     save_svg([('precipProbability', False), ('cloudCover', False)])
