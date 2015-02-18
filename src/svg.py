@@ -13,9 +13,10 @@ class LineChartConfig(pygal.Config):
     interpolation_parameters = {'type': 'finite_difference'}
     width = 900
     height = 400
-    #show_only_major_dots = True
+    show_only_major_dots = False
+    show_dots = False
     legend_at_bottom = True
-    fill = True
+    fill = False
     pretty_print = True
 
 
