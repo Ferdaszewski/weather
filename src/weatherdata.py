@@ -2,7 +2,6 @@
 import datetime
 import json
 import os
-import pytz
 import requests
 
 # Forecast.io API key

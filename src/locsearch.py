@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-#-*- coding: utf-8 -*-
-
-
 """Module to search for a location's longitude and latitude. Currently
 Search is limited to:
 1) US Postal Codes (5 digits only)
@@ -38,16 +34,17 @@ def city_search(term_list):
     """Search the City database for the city.
 
     Args:
-        term_list: List of unicode strings.
+        term_list: List of utf-8 encoded unicode strings.
 
-    When City is found, returns the tuple:
-        (latitude, longitude), "City Name, [state] OR [country]"
+    Returns a tuple:
+        When City is found, returns the tuple:
+            (latitude, longitude), "City Name, [state] OR [country]"
 
-    No matches found, returns the tuple:
-        None, None
+        No matches found, returns the tuple:
+            None, None
 
-    When multiple matches are found, returns the tuple:
-        None, ["City Name, [state] OR [country]", ...]
+        When multiple matches are found, returns the tuple:
+            None, ["City Name, [state] OR [country]", ...]
     """
     # TODO: make search more dynamic/forgiving.
 
@@ -122,63 +119,3 @@ def city_search(term_list):
                          for num, city in enumerate(city_q_list) if num < 10
                          ]
         return None, return_cities
-
-
-if __name__ == '__main__':
-    test_search_db = dbsearch()
-
-    # Zip-code Tests
-    tests = [
-        u"98502",
-        u"12345",
-        u"00000",
-        u"01010",
-        u"zipcode",
-        u"abcde",
-        u"apple",
-        u"099999",
-        u"123j22",
-        "this is a string",
-        123,
-        [],
-        u"bla, ba, bla, ab",
-        u"",
-        u"  \t\n  ",
-        u"  ,  \t,\n,  \t\n,   , ,,,,,,    ",
-        u"Not a City Name?",
-        u"Los Angeles",
-        u"los angeles, ca",
-        u"los angles, ca, united states",
-        u"Springfield",
-        u"Springfield, OR",
-        u"Tokyo",
-        u"PoRtLand",
-        u"PDX",
-        u"Paris",
-        u"Paris, France",
-        u"Paris, TX",
-        u"Olympia",
-        u"London",
-        u"London, United Kingdom",
-        u"djibuti",
-        u"Ho Chi Minh City",
-        u"Thành phố Hồ Chí Minh",
-        "上海市",
-        "Dinas a Sir Caerdydd",
-        "São Tomé",
-        "boring",
-        "batman",
-        "1770",
-        "El Pueblo de Nuestra Señora la Reina de los Ángeles de Porciúncula",
-        u"岡崎市",
-        "秋田",
-        "Akita"
-    ]
-
-    for test in tests:
-        print "=" * 100
-        print "Searching for: ", test
-        result, city = test_search_db.search(test)
-        print result
-        print city
-        print "=" * 100
