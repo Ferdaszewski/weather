@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Weather</title>
+  <title>Birmingham, AL, United States Weather</title>
   <meta name="description" content="A visual weather dashboard">
   <meta name="author" content="Joshua Ferdaszewski">
   <link href='http://fonts.googleapis.com/css?family=Josefin+Sans:300' rel='stylesheet' type='text/css'>
@@ -17,31 +17,37 @@
   <div class="container">
     <header class="row">
       <div class="col-xs-4">
-        <p id="temp">75°</p>
+        <p id="temp">30° F</p>
       </div>
       <div class="col-xs-4">
         <div class="row">
-          <a href="#"><h1 id="city-name" class="col-xs-12">Portland, OR</h1></a>
+          <a href="#"><h1 id="city-name" class="col-xs-12">Birmingham, AL, United States</h1></a>
         </div>
         <div class="row">
         </div>      
       </div>
       <div class="col-xs-4">
-        <div id="weather-alert"><a href="#"><span class="glyphicon glyphicon-warning-sign text-danger"></span></a></div>
+        <div id="weather-alert">
+        
+          <a href="http://alerts.weather.gov/cap/wwacapget.php?x=AL125396A75688.RedFlagWarning.125396B48B00AL.BMXRFWBMX.9aed7ce21ca0a2d1e2928c1d9af6c98f" target="_blank">
+            <span class="glyphicon glyphicon-warning-sign text-danger alert-icon"></span>
+            <p class="alert-text">Red Flag Warning for Jefferson, AL</p>
+          </a>
+        
+        </div>
       </div>
-      <h4 id="weather-description" class="col-xs-12">Foggy starting later tonight, continuing until tomorrow morning.</h4>
+      <h4 id="weather-description" class="col-xs-12">Mostly cloudy starting tonight.</h4>
     </header>
 
     <div style="row spark-wrapper">
-      <figure class="col-xl-6 sparkline-graphic">
-        <span id="temperature" class="sparkline" data-forecast="1,2,3,4,5,6,7,8,9"></span>
-        <span id="wind" class="sparkline" data-forecast="1,2,3,4,5,6,7,8,9"></span>
-      </figure>
-
-      <figure class="col-xl-6 sparkline-graphic">
-        <span id="cloud" class="sparkline" data-forecast="1,2,3,4,5,6,7,8,9"></span>
-        <span id="precip" class="sparkline" data-forecast="1,2,3,4,5,6,7,8,9"></span>
-      </figure>
+      <span id="temperature" class="sparkline col-lg-6" data-forecast="30,27.16,25.89,24.93,24.33,22.9,22.12,21.55,21.03,20.62,20.17,19.8,19.66,19.93,21.27,23.43,26.22,29.35,32.43,34.65,36.15,38.19,38.9,39.63,38.24,38.47,38.24,37.59,36.96,36.55,36.27,36.16,36.16,36.32,36.62,36.9,37.05,37.62,38.51,39.48,41.44,44.64,47.84,50.79,54.08,57.93,60.12,60.66,59.99">Loading temperature...</span>
+      <p>Temperature</p>        
+      <span id="wind" class="sparkline col-lg-6" data-forecast="8.42,5.99,4.77,4.53,4.32,4.28,3.75,3.82,3.82,4.04,3.92,3.96,4.01,4.18,5,6.03,7.01,7.08,7.38,8.05,7.93,8.64,8.19,8.9,8.87,9.39,10.08,10.83,11.47,12.28,12.5,12.79,13.25,13.81,14.18,14.11,13.81,13.54,13.24,12.86,12.66,12.85,13.26,13.66,14.02,14.39,14.52,14.18,13.55">Loading wind speed...</span>
+      <p>Wind Speed</p>        
+      <span id="cloud" class="sparkline col-lg-6" data-forecast="0,0.09,0,0.01,0.01,0.21,0.33,0.42,0.44,0.49,0.55,0.62,0.7,0.75,0.8,0.86,0.87,0.82,0.76,0.75,0.81,0.92,1,1,1,0.97,0.93,0.89,0.86,0.86,0.89,0.93,0.95,0.98,1,1,1,1,1,0.99,0.99,0.99,1,1,1,1,1,1,1">Loading cloud cover...</span>
+      <p>Cloud Cover %</p>        
+      <span id="precip" class="sparkline col-lg-6" data-forecast="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.01,0.01,0.01,0.01,0,0.01,0.01,0.01,0.01,0.02,0.02,0.03,0.05,0.05,0.04,0.02,0.02,0.01,0.01">Loading precipitation...</span>
+      <p>Precipitation %</p>        
     </div>
 
     <footer class="row">

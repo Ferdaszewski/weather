@@ -1,6 +1,8 @@
 #-*- coding: utf-8 -*-
 
 """A weather dashboard web app."""
+import codecs
+import jinja2
 import re
 
 import locsearch
@@ -66,14 +68,70 @@ class Weather(object):
         self.forecast = temp_forecast.data
 
 
-class Chart(object):
-    """A SVG chart."""
-    pass
+class Webpage(object):
+    """Webpage that displays the weather information.
 
+    Args: forecast is a Weather object.
+    """
+    def __init__(self, weather):
+        self.forecast = weather.forecast
+        self.name = weather.location.name
 
-class webpage():
-    """Webpage."""
-    pass
+    def _get_data_list(self, data_key):
+        """Returns a string joined with ',' of elements of the data_key
+        from forecast.
+        """
+        try:
+            data_block = self.forecast['hourly']['data']
+        except IndexError:
+            print "Error. No weather data for hourly time frame."
+        try:
+            data_list = [chunk[data_key] for chunk in data_block]
+        except IndexError:
+            print "Error. JSON data bock %s does not have %s key."
+        return ','.join([str(item) for item in data_list])
+
+    def render_page(self):
+        """Renders the webpage using the forecast data and writes the
+        html file to disk.
+        """
+        # Collect data for template
+        temp_data = {
+            'place_name': self.name,
+            'alert_text': None,
+            'alert_url': None,
+            'daily_desc': self.forecast['hourly']['summary'],
+            'current_temp': int(round(self.forecast['currently']['temperature'])),
+            'data_temp': None,
+            'data_cloud': None,
+            'data_wind': None,
+            'data_precip': None
+        }
+
+        # Set alert data if present
+        try:
+            temp_data['alert_text'] = self.forecast['alerts'][0]['title']
+            temp_data['alert_url'] = self.forecast['alerts'][0]['uri']
+        except KeyError:
+            print "No alert currently for: ", temp_data['place_name']
+
+        # Set list data
+        key_list = [
+            ('data_temp', 'temperature'),
+            ('data_cloud', 'cloudCover'),
+            ('data_wind', 'windSpeed'),
+            ('data_precip', 'precipProbability')
+            ]
+        for loc_key, data_key in key_list:
+            temp_data[loc_key] = self._get_data_list(data_key)
+
+        # Render html
+        env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
+        template = env.get_template('index-template.html')
+        html = template.render(temp_data)
+        with codecs.open('../web/index.html', 'w', 'utf_8') as fpt:
+            fpt.write(html)
+
 
 if __name__ == '__main__':
     # Temporary test of the search functionality
@@ -146,22 +204,10 @@ if __name__ == '__main__':
     #     print '=' * 100
 
     # Temp test from search to forecast to svg
-    search_term = "pdx"
+    search_term = "Birmingham, al"
     temp_loc = Location()
     temp_loc.search(search_term)
     temp_weather = Weather(temp_loc)
     temp_weather.get_forcast()
-
-    def save_svg(metrics):
-        """For testing. Save svg to local file"""
-        line_list = []
-        file_name = ""
-        for metric, sec_bool in metrics:
-            line_list.append(svg.Line(temp_weather.forecast, metric, secondary=sec_bool))
-            file_name += metric + '-'
-        chart = svg.create_chart(line_list)
-        file_name += 'chart.svg'
-        chart.render_to_file("../web/assets/svg/" + file_name)
-
-    save_svg([('temperature', False), ('windSpeed', True)])
-    save_svg([('precipProbability', False), ('cloudCover', False)])
+    temp_webpage = Webpage(temp_weather)
+    temp_webpage.render_page()

@@ -1,5 +1,5 @@
 body {
-  background-color: #eee
+  background-color: #eee;
 }
 
 body, h1, h2, h3, h4, h5, h6 {
@@ -19,11 +19,26 @@ header {
   font-size: 6em;
 }
 
-#weather-alert {
-  font-size: 3em;
+#weather-alert, #temp {
   margin-top: 25px;
 }
 
-.svg-wrapper {
-  margin-top: 50px
+.alert-icon {
+  font-size: 5em;
+}
+
+.alert-text {
+  font-size: 2em;
+}
+
+#weather-description {
+  font-size: 2em;
+}
+
+.spark-wrapper {
+  text-align: center;
+}
+
+.sparkline {
+  margin-top: 15px
 }
