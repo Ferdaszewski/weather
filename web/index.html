@@ -1,9 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="utf-8">
   <title>Weather</title>
+  <meta name="description" content="A visual weather dashboard">
+  <meta name="author" content="Joshua Ferdaszewski">
+  <link href='http://fonts.googleapis.com/css?family=Josefin+Sans:300' rel='stylesheet' type='text/css'>
+  <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.2/simplex/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  <script src="/assets/js/main.js"></script>
 </head>
 <body>
+  <div class="container">
+    <header class="row">
+      <div class="col-xs-4">
+        <p id="temp">75°</p>
+      </div>
+      <div class="col-xs-4">
+        <div class="row">
+          <a href="#"><h1 id="city-name" class="col-xs-12">Portland, OR</h1></a>
+        </div>
+        <div class="row">
+        </div>      
+      </div>
+      <div class="col-xs-4">
+        <div id="weather-alert"><a href="#"><span class="glyphicon glyphicon-warning-sign text-danger"></span></a></div>
+      </div>
+      <h4 id="weather-description" class="col-xs-12">Foggy starting later tonight, continuing until tomorrow morning.</h4>
+    </header>
 
+    <div style="row svg-wrapper">
+      <figure id="svg1" class="col-xl-6 svg-graphic">
+        <embed type="image/svg+xml" src="assets/svg/temperature-windSpeed-chart.svg" />
+      </figure>
+
+      <figure id="svg1" class="col-xl-6 svg-graphic">
+        <embed type="image/svg+xml" src="assets/svg/precipProbability-cloudCover-chart.svg" />
+      </figure>
+    </div>
+
+    <footer class="row">
+      
+    </footer>
+  </div>
 </body>
 </html>

@@ -2,22 +2,32 @@
 import json
 import pygal
 
-# Temp data
-with open('data-dump.json', 'r') as f:
-    TEST_JSON = json.load(f)
+# Custom svg CSS style file
+CUSTOM_SVG_CSS = '../web/assets/css/svg.css'
 
+# Customized configuration class
+chart_config = pygal.Config()
+chart_config.interpolate = 'hermite'
+chart_config.interpolation_parameters = {'type': 'finite_difference'}
+chart_config.width = 900
+chart_config.height = 400
+chart_config.show_dots = True
+chart_config.dots_size = 1
+chart_config.legend_at_bottom = True
+chart_config.fill = False
+chart_config.pretty_print = True
+chart_config.x_title = "Next 48 hours"
+chart_config.show_x_labels = False
+chart_config.show_y_labels = False
+chart_config.tooltip_border_radius = 4
+chart_config.tooltip_font_size = 12
+chart_config.css.append(CUSTOM_SVG_CSS)
 
-class LineChartConfig(pygal.Config):
-    """Customized configuration class for charts."""
-    interpolate = 'hermite'
-    interpolation_parameters = {'type': 'finite_difference'}
-    width = 900
-    height = 400
-    show_only_major_dots = False
-    show_dots = False
-    legend_at_bottom = True
-    fill = False
-    pretty_print = True
+# Customized style class
+chart_style = pygal.style.Style(
+    background='transparent',
+    plot_background='transparent'
+    )
 
 
 class Line(object):
@@ -62,7 +72,7 @@ class Line(object):
 
 def create_chart(line_list):
     """Returns an pygal chart created from a list of Line objects."""
-    chart = pygal.Line(LineChartConfig())
+    chart = pygal.Line(chart_config, style=chart_style)
     min_max_index = []
 
     for line in line_list:
@@ -72,10 +82,10 @@ def create_chart(line_list):
         for i, j in enumerate(line.data):
             if j == min(line.data) or j == max(line.data):
                 min_max_index.append(str(i))
-        chart.x_labels = map(str, range(len(line.data)))
+        # chart.x_labels = map(str, range(len(line.data)))
 
     # Mark min and max value dots
-    chart.x_labels_major = min_max_index
+    # chart.x_labels_major = min_max_index
 
     return chart
 
@@ -89,7 +99,7 @@ if __name__ == '__main__':
             file_name += metric + '-'
         chart = create_chart(line_list)
         file_name += 'chart.svg'
-        chart.render_to_file("../web/svg/" + file_name)
+        chart.render_to_file("../web/assets/svg/" + file_name)
 
     # Test case 1 - % based metrics
     save_svg([('precipProbability', False), ('cloudCover', False)])

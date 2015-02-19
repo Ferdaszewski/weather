@@ -4,6 +4,7 @@
 import re
 
 import locsearch
+import svg
 import weatherdata
 
 
@@ -63,9 +64,6 @@ class Weather(object):
         """
         temp_forecast = weatherdata.Forecast(*self.location.lat_lng)
         self.forecast = temp_forecast.data
-        print self.location.name
-        print temp_forecast.headers
-        print self.forecast
 
 
 class Chart(object):
@@ -130,19 +128,40 @@ if __name__ == '__main__':
     #         print new_location.name
     #     print "=" * 100
 
-    # Temp test for search to forecast to svg
-    tests = [
-        "batman"
-    ]
+    # Temp test for search to forecast
+    # tests = [
+    #     "pdx"
+    # ]
 
-    for test in tests:
-        temp_loc = Location()
-        print "=" * 100
-        print "Forecast for: " + test
-        if temp_loc.search(test):
-            Weather(temp_loc).get_forcast()
-        else:
-            print "%s not found." % test
-            print "Possible matches: "
-            print temp_loc.name
-        print '=' * 100
+    # for test in tests:
+    #     temp_loc = Location()
+    #     print "=" * 100
+    #     print "Forecast for: " + test
+    #     if temp_loc.search(test):
+    #         Weather(temp_loc).get_forcast()
+    #     else:
+    #         print "%s not found." % test
+    #         print "Possible matches: "
+    #         print temp_loc.name
+    #     print '=' * 100
+
+    # Temp test from search to forecast to svg
+    search_term = "pdx"
+    temp_loc = Location()
+    temp_loc.search(search_term)
+    temp_weather = Weather(temp_loc)
+    temp_weather.get_forcast()
+
+    def save_svg(metrics):
+        """For testing. Save svg to local file"""
+        line_list = []
+        file_name = ""
+        for metric, sec_bool in metrics:
+            line_list.append(svg.Line(temp_weather.forecast, metric, secondary=sec_bool))
+            file_name += metric + '-'
+        chart = svg.create_chart(line_list)
+        file_name += 'chart.svg'
+        chart.render_to_file("../web/assets/svg/" + file_name)
+
+    save_svg([('temperature', False), ('windSpeed', True)])
+    save_svg([('precipProbability', False), ('cloudCover', False)])
