@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="assets/css/main.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  <script src="/assets/sparklines/jquery.sparkline.min.js"></script>
   <script src="/assets/js/main.js"></script>
 </head>
 <body>
@@ -31,13 +32,15 @@
       <h4 id="weather-description" class="col-xs-12">Foggy starting later tonight, continuing until tomorrow morning.</h4>
     </header>
 
-    <div style="row svg-wrapper">
-      <figure id="svg1" class="col-xl-6 svg-graphic">
-        <embed type="image/svg+xml" src="assets/svg/temperature-windSpeed-chart.svg" />
+    <div style="row spark-wrapper">
+      <figure class="col-xl-6 sparkline-graphic">
+        <span id="temperature" class="sparkline" data-forecast="1,2,3,4,5,6,7,8,9"></span>
+        <span id="wind" class="sparkline" data-forecast="1,2,3,4,5,6,7,8,9"></span>
       </figure>
 
-      <figure id="svg1" class="col-xl-6 svg-graphic">
-        <embed type="image/svg+xml" src="assets/svg/precipProbability-cloudCover-chart.svg" />
+      <figure class="col-xl-6 sparkline-graphic">
+        <span id="cloud" class="sparkline" data-forecast="1,2,3,4,5,6,7,8,9"></span>
+        <span id="precip" class="sparkline" data-forecast="1,2,3,4,5,6,7,8,9"></span>
       </figure>
     </div>
 
