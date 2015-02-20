@@ -8,7 +8,7 @@ body, h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 4em;
+  font-size: 2em;
 }
 
 header {
@@ -16,7 +16,7 @@ header {
 }
 
 #temp {
-  font-size: 6em;
+  font-size: 5em;
 }
 
 #weather-alert, #temp {
@@ -32,13 +32,33 @@ header {
 }
 
 #weather-description {
-  font-size: 2em;
-}
-
-.spark-wrapper {
-  text-align: center;
+  font-size: 1.5em;
+  margin-top: -1.5em;
 }
 
 .sparkline {
-  margin-top: 15px
+  text-align: center;
+  margin-top: 15px;
+  height: 250px;
+}
+
+.chart-legend {
+  text-align: center;
+  font-size: 1.5em;
+}
+
+#wind-text {
+  color: #80EB6A ;
+}
+
+#temp-text {
+  color: #FB727F ;
+}
+
+#precip-text {
+  color: #5ED0C8 ;
+}
+
+#cloud-text {
+  color: #FFB074 ;
 }
