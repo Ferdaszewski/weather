@@ -2,11 +2,13 @@
 
 """A weather dashboard web app."""
 import codecs
+from datetime import datetime
+from datetime import timedelta
 import jinja2
+import pytz
 import re
 
 import locsearch
-import svg
 import weatherdata
 
 
@@ -60,7 +62,7 @@ class Weather(object):
         self.location = location
         self.forecast = {}
 
-    def get_forcast(self, time=None):
+    def get_forecast(self, time=None):
         """Get the forecast for location, with the option to define a
         past or future datetime.datetime. Default None is now.
         """
@@ -77,19 +79,48 @@ class Webpage(object):
         self.forecast = weather.forecast
         self.name = weather.location.name
 
-    def _get_data_list(self, data_key):
-        """Returns a string joined with ',' of elements of the data_key
-        from forecast.
+    def _get_data_list(self, data_key, time_frame='hourly'):
+        """Returns list of elements of the data_key from forecast in the
+        time_frame.
         """
         try:
-            data_block = self.forecast['hourly']['data']
+            data_block = self.forecast[time_frame]['data']
         except IndexError:
             print "Error. No weather data for hourly time frame."
         try:
             data_list = [chunk[data_key] for chunk in data_block]
         except IndexError:
             print "Error. JSON data bock %s does not have %s key."
-        return ','.join([str(item) for item in data_list])
+        return data_list
+
+    def _utc_to_loc(self, dt_list, loc_tz):
+        """Helper method to convert a list of Unix timestamps to the
+        loc_tz timezone and round to the nearest hour and return it.
+        """
+        # Convert from a Unix timestamp to a datetime object
+        utc_tz = pytz.utc
+        dt_list = [datetime.utcfromtimestamp(dt).replace(tzinfo=utc_tz)
+                   for dt in dt_list]
+
+        # Localize and normalize datetime to forecast timezone
+        dt_list = [loc_tz.normalize(utc_dt.astimezone(loc_tz))
+                   for utc_dt in dt_list]
+
+        # Round to the nearest hour (3600 seconds)
+        hour = 3600
+        for idx, dt_loc in enumerate(dt_list):
+            # Remove timezone for math to work
+            dt_loc = dt_loc.replace(tzinfo=None)
+
+            # Round naive time to nearest hour
+            seconds = (dt_loc - dt_loc.min).seconds
+            rounding = (seconds+hour/2) // hour * hour
+            dt_loc += timedelta(0, rounding-seconds, -dt_loc.microsecond)
+
+            # Add timezone back in
+            dt_list[idx] = dt_loc.replace(tzinfo=loc_tz)
+
+        return dt_list
 
     def render_page(self):
         """Renders the webpage using the forecast data and writes the
@@ -105,7 +136,9 @@ class Webpage(object):
             'data_temp': None,
             'data_cloud': None,
             'data_wind': None,
-            'data_precip': None
+            'data_precip': None,
+            'sunset': None,
+            'sunrise': None
         }
 
         # Set alert data if present
@@ -123,7 +156,48 @@ class Webpage(object):
             ('data_precip', 'precipProbability')
             ]
         for loc_key, data_key in key_list:
-            temp_data[loc_key] = self._get_data_list(data_key)
+            temp_data[loc_key] = ','.join([str(item) for item in
+                                          self._get_data_list(data_key)])
+
+        # Range of hours in the chart, localized to forecast timezone
+        loc_tz = pytz.timezone(self.forecast['timezone'])
+        dt_range = self._get_data_list('time')
+        dt_range = self._utc_to_loc(dt_range, loc_tz)
+
+        # Sunset and sunrise, localized to forecast timezone
+        sunrise_dt = self._get_data_list('sunriseTime', time_frame='daily')
+        sunrise_dt = self._utc_to_loc(sunrise_dt, loc_tz)
+        sunset_dt = self._get_data_list('sunsetTime', time_frame='daily')
+        sunset_dt = self._utc_to_loc(sunset_dt, loc_tz)
+
+        # Create sunset and sunrise binary arrays
+        sunrise = []
+        sunset = []
+
+        # Trim past sunsets/rises
+        first_hour = dt_range[0]
+        for idx, srise in enumerate(sunrise_dt):
+            if srise < first_hour:
+                del sunrise_dt[idx]
+        for idx, sset in enumerate(sunset_dt):
+            if sset < first_hour:
+                del sunset_dt[idx]
+
+        # Create binary sunset/rise lists
+        for hour in dt_range:
+            if hour == sunrise_dt[0]:
+                sunrise.append(1)
+                del sunrise_dt[0]
+            elif hour == sunset_dt[0]:
+                sunset.append(1)
+                del sunset_dt[0]
+            else:
+                sunrise.append(0)
+                sunset.append(0)
+
+        # Add sunset/rise binary to template data
+        temp_data['sunrise'] = ','.join([str(item) for item in sunrise])
+        temp_data['sunset'] = ','.join([str(item) for item in sunset])
 
         # Render html
         env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
@@ -196,7 +270,7 @@ if __name__ == '__main__':
     #     print "=" * 100
     #     print "Forecast for: " + test
     #     if temp_loc.search(test):
-    #         Weather(temp_loc).get_forcast()
+    #         Weather(temp_loc).get_forecast()
     #     else:
     #         print "%s not found." % test
     #         print "Possible matches: "
@@ -208,6 +282,6 @@ if __name__ == '__main__':
     temp_loc = Location()
     temp_loc.search(search_term)
     temp_weather = Weather(temp_loc)
-    temp_weather.get_forcast()
+    temp_weather.get_forecast()
     temp_webpage = Webpage(temp_weather)
     temp_webpage.render_page()

@@ -40,13 +40,13 @@
     </header>
 
     <div style="row spark-wrapper">
-      <span id="wind-temp" class="sparkline col-xs-12" data-forecast-wind="{{ data_wind }}" data-forecast-temp="{{ data_temp }}">Loading...</span>
+      <span id="wind-temp" class="sparkline col-xs-12" data-forecast-wind="{{ data_wind }}" data-forecast-temp="{{ data_temp }}" data-sunset="{{ sunset }}" data-sunrise="{{ sunrise }}">Loading...</span>
       <p class="chart-legend">
-        <span id="temp-text">Temperature</span> and <span id="wind-text">Wind Speed</span>
+        <span id="temp-text">Temperature</span> and <span id="wind-text">Wind Speed</span> (<span id="sunrise">Sunrise</span>/<span id="sunset">Sunset</span>)
       </p>        
-      <span id="cloud-precip" class="sparkline col-xs-12" data-forecast-cloud="{{ data_cloud }}" data-forecast-precip="{{ data_precip }}">Loading...</span>
+      <span id="cloud-precip" class="sparkline col-xs-12" data-forecast-cloud="{{ data_cloud }}" data-forecast-precip="{{ data_precip }}" data-sunset="{{ sunset }}" data-sunrise="{{ sunrise }}">Loading...</span>
       <p class="chart-legend">
-        <span id="precip-text">Chance of Precipitation</span> and <span id="cloud-text">Cloud Cover</span>
+        <span id="precip-text">Chance of Precipitation</span> and <span id="cloud-text">Cloud Cover</span> (<span id="sunrise">Sunrise</span>/<span id="sunset">Sunset</span>)
       </p>
     </div>
 

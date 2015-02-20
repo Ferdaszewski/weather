@@ -9,9 +9,9 @@ import sys
 
 # Constants
 DATE_FORMAT = '%Y-%m-%d'
-CITY_DATA_FILE = 'sources/geonames/cities5000.txt'
-COUNTRY_DATA_FILE = 'sources/geonames/countryInfo.txt'
-ZIP_DATA_FILE = 'sources/uszip/US.txt'
+CITY_DATA_FILE = 'data-sources/geonames/cities5000.txt'
+COUNTRY_DATA_FILE = 'data-sources/geonames/countryInfo.txt'
+ZIP_DATA_FILE = 'data-sources/uszip/US.txt'
 USZIP_KEYS = (
     'country_code',
     'postal_code',
@@ -129,7 +129,7 @@ def load_file(file_name, data_keys):
     csv.field_size_limit(sys.maxsize)
 
     with codecs.open(file_name, 'r', 'utf_8') as data_file:
-        reader = unicode_csv_reader(data_file, delimiter='\t')
+        reader = unicode_csv_reader(data_file, delimiter='\t', doublequote=False)
         cities = []
         num_cities = 0
         for row in reader:

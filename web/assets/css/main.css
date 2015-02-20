@@ -28,7 +28,7 @@ header {
 }
 
 .alert-text {
-  font-size: 2em;
+  font-size: 1.5em;
 }
 
 #weather-description {
@@ -48,17 +48,25 @@ header {
 }
 
 #wind-text {
-  color: #80EB6A ;
+  color: #80EB6A;
 }
 
 #temp-text {
-  color: #FB727F ;
+  color: #FB727F;
 }
 
 #precip-text {
-  color: #5ED0C8 ;
+  color: #5ED0C8;
 }
 
 #cloud-text {
   color: #FFB074 ;
+}
+
+#sunrise {
+  color: #FFC900;
+}
+
+#sunset {
+  color: #066CAE;
 }
