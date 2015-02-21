@@ -278,7 +278,7 @@ if __name__ == '__main__':
     #     print '=' * 100
 
     # Temp test from search to forecast to svg
-    search_term = "pdx"
+    search_term = "New York City, NY"
     temp_loc = Location()
     temp_loc.search(search_term)
     temp_weather = Weather(temp_loc)

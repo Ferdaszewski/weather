@@ -129,7 +129,9 @@ def load_file(file_name, data_keys):
     csv.field_size_limit(sys.maxsize)
 
     with codecs.open(file_name, 'r', 'utf_8') as data_file:
-        reader = unicode_csv_reader(data_file, delimiter='\t', doublequote=False)
+        # Double quote char in alternative names field not escape char
+        reader = unicode_csv_reader(data_file, delimiter="\t",
+                                    quoting=csv.QUOTE_NONE)
         cities = []
         num_cities = 0
         for row in reader:
