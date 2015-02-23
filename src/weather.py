@@ -132,7 +132,8 @@ class Webpage(object):
             'alert_text': None,
             'alert_url': None,
             'daily_desc': self.forecast['hourly']['summary'],
-            'current_temp': int(round(self.forecast['currently']['temperature'])),
+            'current_temp': int(round(
+                                self.forecast['currently']['temperature'])),
             'data_temp': None,
             'data_cloud': None,
             'data_wind': None,
@@ -170,34 +171,30 @@ class Webpage(object):
         sunset_dt = self._get_data_list('sunsetTime', time_frame='daily')
         sunset_dt = self._utc_to_loc(sunset_dt, loc_tz)
 
-        # Create sunset and sunrise binary arrays
-        sunrise = []
-        sunset = []
-
         # Trim past sunsets/rises
         first_hour = dt_range[0]
-        for idx, srise in enumerate(sunrise_dt):
-            if srise < first_hour:
-                del sunrise_dt[idx]
-        for idx, sset in enumerate(sunset_dt):
-            if sset < first_hour:
-                del sunset_dt[idx]
+        if sunrise_dt[0] < first_hour:
+            del sunrise_dt[0]
+        if sunset_dt[0] < first_hour:
+            del sunset_dt[0]
 
-        # Create binary sunset/rise lists
+        # Find out if first hour is day or night
+        if sunrise_dt[0] < sunset_dt[0]:
+            night_hour = 1
+        else:
+            night_hour = 0
+
+        # Create hourly binary night list (day = 0 night =1)
+        night = []
         for hour in dt_range:
             if hour == sunrise_dt[0]:
-                sunrise.append(1)
+                night_hour = 0
                 del sunrise_dt[0]
             elif hour == sunset_dt[0]:
-                sunset.append(1)
+                night_hour = 1
                 del sunset_dt[0]
-            else:
-                sunrise.append(0)
-                sunset.append(0)
-
-        # Add sunset/rise binary to template data
-        temp_data['sunrise'] = ','.join([str(item) for item in sunrise])
-        temp_data['sunset'] = ','.join([str(item) for item in sunset])
+            night.append(night_hour)
+        temp_data['night'] = ','.join([str(item) for item in night])
 
         # Render html
         env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
@@ -278,7 +275,7 @@ if __name__ == '__main__':
     #     print '=' * 100
 
     # Temp test from search to forecast to svg
-    search_term = "New York City, NY"
+    search_term = "pdx"
     temp_loc = Location()
     temp_loc.search(search_term)
     temp_weather = Weather(temp_loc)

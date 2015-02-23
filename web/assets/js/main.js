@@ -1,38 +1,13 @@
 function drawSparklines() {
   
-  var options_sunrise = {
+  var options_night = {
     type: 'line',
     width: '100%',
     height: '100%',
-    lineColor: '#FFC900',
-    fillColor: false,
+    lineColor: 'rgba(0,0,0,.1)',
+    fillColor: 'rgba(0,0,0,.1)',
 
-    numberFormatter: sunrise_text,
-
-    lineWidth: 2,
-    spotColor: null,
-    minSpotColor: null,
-    maxSpotColor: null,
-    highlightSpotColor: null,
-
-    chartRangeMin: 0,
-    chartRangeMax: 1,
-
-    composite: true,
-    disableTooltips: false,
-    disableHighlight: false,
-    highlightLineColor: null,
-    disableHiddenCheck: true
-  };
-
-  var options_sunset = {
-    type: 'line',
-    width: '100%',
-    height: '100%',
-    lineColor: '#066CAE',
-    fillColor: false,
-
-    numberFormatter: sunset_text,
+    numberFormatter: night_day,
 
     lineWidth: 2,
     spotColor: null,
@@ -146,8 +121,7 @@ function drawSparklines() {
     disableHiddenCheck: true
   };
 
-  var forecast_sunrise = $('#wind-temp').data('sunrise').split(',');
-  var forecast_sunset = $('#wind-temp').data('sunset').split(',');
+  var forecast_night = $('#wind-temp').data('night').split(',');
 
   var forecast_temp = $('#wind-temp').data('forecast-temp').split(',');
   var forecast_wind = $('#wind-temp').data('forecast-wind').split(',');
@@ -155,36 +129,24 @@ function drawSparklines() {
   var forecast_cloud = $('#cloud-precip').data('forecast-cloud').split(',');
   var forecast_precip = $('#cloud-precip').data('forecast-precip').split(',');
 
+  console.log("Drawing Sparklines...")
   $('#wind-temp').sparkline(forecast_wind, options_wind);
   $('#wind-temp').sparkline(forecast_temp, options_temp);
-  $('#wind-temp').sparkline(forecast_sunrise, options_sunrise);
-  $('#wind-temp').sparkline(forecast_sunset, options_sunset);
+  $('#wind-temp').sparkline(forecast_night, options_night);
 
   $('#cloud-precip').sparkline(forecast_cloud, options_cloud);
   $('#cloud-precip').sparkline(forecast_precip, options_precip);
-  $('#cloud-precip').sparkline(forecast_sunrise, options_sunrise);
-  $('#cloud-precip').sparkline(forecast_sunset, options_sunset);
+  $('#cloud-precip').sparkline(forecast_night, options_night);
 
   function percent(num) {
     return num * 100;
   };
 
-  function sunset_text(num) {
-    if (num === 0) {
-      return null;
-    }
-    else {
-      return "Sunset";
-    }
-  };
-
-    function sunrise_text(num) {
-    if (num === 0) {
-      return null;
-    }
-    else {
-      return "Sunrise";
-    }
+  function night_day(num) {
+    if (num === 1)
+      return "Night";
+    else
+      return "Day";
   };
 }
 
@@ -195,7 +157,6 @@ $(document).ready(function() {
   var resizeTimer
   $(window).resize( function() {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(drawSparklines(), 1000);
-    console.log("resizing window")
+    resizeTimer = setTimeout(drawSparklines, 500);
   });
 });

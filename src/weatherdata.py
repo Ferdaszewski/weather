@@ -10,7 +10,7 @@ API_KEY = os.environ["FORECASTIO_API"]
 
 class Forecast(object):
     """Forecast data for a specific location and time"""
-    def __init__(self, lat, lng, time=None, units='auto'):
+    def __init__(self, lat, lng, time=None, units='us'):
         self.lat = lat
         self.lng = lng
         self.units = units
