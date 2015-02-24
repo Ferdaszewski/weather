@@ -123,8 +123,8 @@ class Webpage(object):
         return dt_list
 
     def render_page(self):
-        """Renders the webpage using the forecast data and writes the
-        html file to disk.
+        """Renders the webpage using the forecast data and returns the
+        html as a string.
         """
         # Collect data for template
         temp_data = {
@@ -199,9 +199,7 @@ class Webpage(object):
         # Render html
         env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
         template = env.get_template('index-template.html')
-        html = template.render(temp_data)
-        with codecs.open('../web/index.html', 'w', 'utf_8') as fpt:
-            fpt.write(html)
+        return template.render(temp_data)
 
 
 if __name__ == '__main__':
@@ -281,4 +279,8 @@ if __name__ == '__main__':
     temp_weather = Weather(temp_loc)
     temp_weather.get_forecast()
     temp_webpage = Webpage(temp_weather)
-    temp_webpage.render_page()
+    html = temp_webpage.render_page()
+
+    # Write html to file
+    with codecs.open('../web/index.html', 'w', 'utf_8') as fpt:
+        fpt.write(html)
