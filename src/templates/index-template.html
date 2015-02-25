@@ -21,7 +21,12 @@
       </div>
       <div class="col-xs-4">
         <div class="row">
-          <a href="#"><h1 id="city-name" class="col-xs-12">{{ place_name }}</h1></a>
+          <h1 id="city-name" class="col-xs-12">{{ place_name }}</h1>
+          <form action="" method="POST" target="_self">
+            <label for="text">Enter City name or US Postal Code</label>
+            <input type="text" name="search_term"/>
+            <button type="submit">Search</button>
+          </form>
         </div>
         <div class="row">
         </div>      

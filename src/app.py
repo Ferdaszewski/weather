@@ -6,13 +6,15 @@ from weather import Weather, Location, Webpage
 
 @bottle.route('/')
 @bottle.post('/')
-@bottle.route('/<url_search>')
-def do_weather(url_search="Portland, OR"):
+def do_weather():
+    """Search for location and get current weather. Post used so search
+    term can be Unicode.
+    """
     post_search = bottle.request.forms.get('search_term')
     if post_search:
         search_term = post_search
     else:
-        search_term = url_search
+        search_term = "Portland, OR"
 
     # Find the location
     location = Location()
@@ -27,6 +29,8 @@ def do_weather(url_search="Portland, OR"):
 
 @bottle.route('/assets/<filepath:path>')
 def server_static(filepath):
+    """Static website assets."""
     return bottle.static_file(filepath, root='../web/assets')
 
+# Development server
 bottle.run(host='localhost', port=8080, debug=True, reloader=True)
