@@ -64,10 +64,16 @@ class Weather(object):
 
     def get_forecast(self, time=None):
         """Get the forecast for location, with the option to define a
-        past or future datetime.datetime. Default None is now.
+        past or future datetime.datetime. Default time is is current.
+        Returns boolean indicating success.
         """
-        temp_forecast = weatherdata.Forecast(*self.location.lat_lng)
-        self.forecast = temp_forecast.data
+        try:
+            temp_forecast = weatherdata.Forecast(*self.location.lat_lng,
+                                                 time=time)
+            self.forecast = temp_forecast.data
+            return True
+        except TypeError:
+            return False
 
 
 class Webpage(object):
@@ -86,11 +92,11 @@ class Webpage(object):
         try:
             data_block = self.forecast[time_frame]['data']
         except IndexError:
-            print "Error. No weather data for hourly time frame."
+            raise IndexError("Error. No weather data for hourly time frame.")
         try:
             data_list = [chunk[data_key] for chunk in data_block]
         except IndexError:
-            print "Error. JSON data bock %s does not have %s key."
+            raise IndexError("Error. JSON data bock %s does not have %s key.")
         return data_list
 
     def _utc_to_loc(self, dt_list, loc_tz):
@@ -126,6 +132,24 @@ class Webpage(object):
         """Renders the webpage using the forecast data and returns the
         html as a string.
         """
+        if self.forecast:
+            return self.render_weather()
+        else:
+            return self.render_error()
+
+    def render(self, data):
+        """Renders the web page and returns the html as a string."""
+        # Render html
+        env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
+        template = env.get_template('index-template.html')
+        return template.render(data)
+
+    def render_error(self):
+        """Renders the error page and returns the html as a string."""
+        return self.render({'place_name': self.name})
+
+    def render_weather(self):
+        """Renders the weather webpage and returns html as a string."""
         # Collect data for template
         temp_data = {
             'place_name': self.name,
@@ -197,9 +221,7 @@ class Webpage(object):
         temp_data['night'] = ','.join([str(item) for item in night])
 
         # Render html
-        env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
-        template = env.get_template('index-template.html')
-        return template.render(temp_data)
+        return self.render(temp_data)
 
 
 if __name__ == '__main__':

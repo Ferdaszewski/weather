@@ -17,7 +17,6 @@ def zip_search(term):
     try:
         result = locdb.UsZip.get(postal_code=term)
     except locdb.UsZip.DoesNotExist:
-        print "Postal Code %s not found." % term
         return None, None
     else:
         return ((result.latitude, result.longitude),
@@ -62,7 +61,6 @@ def city_search(term_list):
                     term_list[0].lower())).dicts()
             num_cities = city_query.count()
             if num_cities == 0:
-                print "No matches after alternate city name search."
                 return None, None
     finally:
         locdb.db.close()

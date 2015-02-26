@@ -1,11 +1,12 @@
+#!/usr/bin/env python
+
 """Routes for a weather dashboard web application."""
 import bottle
 
 from weather import Weather, Location, Webpage
 
 
-@bottle.route('/')
-@bottle.post('/')
+@bottle.route('/', method=['GET', 'POST'])
 def do_weather():
     """Search for location and get current weather. Post used so search
     term can be Unicode.
@@ -32,5 +33,7 @@ def server_static(filepath):
     """Static website assets."""
     return bottle.static_file(filepath, root='../web/assets')
 
-# Development server
-bottle.run(host='localhost', port=8080, debug=True, reloader=True)
+
+if __name__ == '__main__':
+    # Development server.
+    bottle.run(host='localhost', port=8080, debug=True, reloader=True)
