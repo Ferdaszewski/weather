@@ -20,13 +20,20 @@ def zip_search(term):
         return None, None
     else:
         return ((result.latitude, result.longitude),
-                ', '.join((result.place_name,
-                          result.admin1_name,
-                          'United States')
-                          )
-                )
+                ', '.join((result.place_name, result.admin1_name)))
     finally:
         locdb.db.close()
+
+
+def city_format(city):
+    """Takes a city dict and returns a formated string representation."""
+    if city['country_name'] == "United States":
+        city_name = ', '.join((city['name'],
+                               city['admin1']))
+    else:
+        city_name = ', '.join((city['name'],
+                               city['country_name']))
+    return city_name
 
 
 def city_search(term_list):
@@ -68,19 +75,11 @@ def city_search(term_list):
     # One city found, no additional search needed
     if num_cities == 1:
         return ((city_query[0]['latitude'], city_query[0]['longitude']),
-                ', '.join((city_query[0]['name'],
-                          city_query[0]['admin1'],
-                          city_query[0]['country_name'])
-                          )
-                )
+                city_format(city_query[0]))
 
     if len(term_list) != 2:
-        return_cities = [', '.join((city['name'],
-                                   city['admin1'],
-                                   city['country_name'])
-                                   )
-                         for num, city in enumerate(city_query) if num < 10
-                         ]
+        return_cities = [city_format(city)
+                         for num, city in enumerate(city_query) if num < 10]
         return None, return_cities
 
     city_q_list = []
@@ -102,18 +101,10 @@ def city_search(term_list):
     # Check new city_q_list
     if len(city_q_list) == 1:
         return ((city_q_list[0]['latitude'], city_q_list[0]['longitude']),
-                ', '.join((city_q_list[0]['name'],
-                          city_q_list[0]['admin1'],
-                          city_q_list[0]['country_name'])
-                          )
-                )
+                city_format(city_q_list[0]))
     elif len(city_q_list) == 0:
         return None, None
     else:
-        return_cities = [', '.join((city['name'],
-                                   city['admin1'],
-                                   city['country_name'])
-                                   )
-                         for num, city in enumerate(city_q_list) if num < 10
-                         ]
+        return_cities = [city_format(city)
+                         for num, city in enumerate(city_q_list) if num < 10]
         return None, return_cities

@@ -44,7 +44,8 @@ class Location(object):
         # Zip-code-like string (i.e. five digits)
         if len(search_list) == 1 and re.match(r'^\d{5}$', search_list[0]):
             result, place = locsearch.zip_search(search_list[0])
-        # Search for the city
+
+        # Search for a city
         else:
             result, place = locsearch.city_search(search_list)
 
@@ -146,7 +147,14 @@ class Webpage(object):
 
     def render_error(self):
         """Renders the error page and returns the html as a string."""
-        return self.render({'place_name': self.name})
+        possible_cities = self.name
+        if possible_cities is None:
+            message = "No location found. Please try again."
+        else:
+            message = "Multiple cities found.</br>"
+            message += '</br>'.join([city for city in possible_cities])
+
+        return self.render({'place_name': message})
 
     def render_weather(self):
         """Renders the weather webpage and returns html as a string."""
@@ -171,7 +179,8 @@ class Webpage(object):
             temp_data['alert_text'] = self.forecast['alerts'][0]['title']
             temp_data['alert_url'] = self.forecast['alerts'][0]['uri']
         except KeyError:
-            print "No alert currently for: ", temp_data['place_name']
+            # No weather alert for this location
+            pass
 
         # Set list data
         key_list = [
@@ -295,7 +304,7 @@ if __name__ == '__main__':
     #     print '=' * 100
 
     # Temp test from search to forecast to svg
-    search_term = "pdx"
+    search_term = "portland, OR"
     temp_loc = Location()
     temp_loc.search(search_term)
     temp_weather = Weather(temp_loc)

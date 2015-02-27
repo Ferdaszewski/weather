@@ -158,5 +158,6 @@ $(document).ready(function() {
   $(window).resize( function() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(drawSparklines, 500);
+
   });
 });

@@ -15,33 +15,37 @@
 </head>
 <body>
   <div class="container">
-    <header class="row">
-      <div class="col-xs-4">
-        <p id="temp">{{ current_temp }}°</p>
-      </div>
-      <div class="col-xs-4">
-        <div class="row">
-          <h1 id="city-name" class="col-xs-12">{{ place_name }}</h1>
-          <form action="" method="POST" target="_self">
+    <header>
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="row">
+            <h1 id="city-name" class="col-xs-12">{{ place_name }}</h1>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <form class="col-xs-12" action="/" method="POST">
             <label for="text">Enter City name or US Postal Code</label>
-            <input type="text" name="search_term"/>
-            <button type="submit">Search</button>
+            <input id="new-search-term" type="text" name="search_term"/>
+            <button id="new-search-btn" type="submit">Search</button>
           </form>
         </div>
-        <div class="row">
-        </div>      
       </div>
-      <div class="col-xs-4">
-        <div id="weather-alert">
-        {% if alert_text is not none %}
-          <a href="{{ alert_url }}" target="_blank">
-            <span class="glyphicon glyphicon-warning-sign text-danger alert-icon"></span>
-            <p class="alert-text">{{ alert_text }}</p>
-          </a>
-        {% endif %}
+      <div class="row">
+        <div class="col-sm-6">
+          <p class="col-xs-12" id="temp">{% if current_temp %}{{ current_temp }}°{% endif %}</p>
+          <h4 id="weather-description" class="col-xs-12">{{ daily_desc }}</h4>
+        </div>
+        <div class="col-sm-6">
+          <div id="weather-alert">
+          {% if alert_text %}
+            <a href="{{ alert_url }}" target="_blank">
+              <span class="glyphicon glyphicon-warning-sign text-danger alert-icon"></span>
+              <p class="alert-text">{{ alert_text }}</p>
+            </a>
+          {% endif %}
+          </div>
         </div>
       </div>
-      <h4 id="weather-description" class="col-xs-12">{{ daily_desc }}</h4>
     </header>
 
     <div style="row spark-wrapper">

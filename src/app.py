@@ -2,6 +2,7 @@
 
 """Routes for a weather dashboard web application."""
 import bottle
+import socket
 
 from weather import Weather, Location, Webpage
 
@@ -19,7 +20,10 @@ def do_weather():
 
     # Find the location
     location = Location()
-    location.search(search_term)
+    try:
+        location.search(search_term)
+    except TypeError:
+        print "Search term error."
 
     # Get weather info for location
     weather = Weather(location)
@@ -33,7 +37,6 @@ def server_static(filepath):
     """Static website assets."""
     return bottle.static_file(filepath, root='../web/assets')
 
-
 if __name__ == '__main__':
-    # Development server.
-    bottle.run(host='localhost', port=8080, debug=True, reloader=True)
+    # Local development server.
+    bottle.run(host='0.0.0.0', port=8080, debug=True, reloader=True)
